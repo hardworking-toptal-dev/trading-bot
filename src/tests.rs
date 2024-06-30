@@ -1,42 +1,46 @@
 #[cfg(test)]
 mod test_helpers {
-    use crate::helpers::{convert_increment_to_precision, invert_side, read_settings, SettingsFile,
-                         Side, write_to_csv};
+    use crate::helpers::{
+        convert_increment_to_precision, invert_side, read_settings, write_to_csv, SettingsFile, Side
+    };
+    use rust_decimal::prelude::FromPrimitive;
+    use rust_decimal::Decimal;
+    use csv::Reader;
+    use std::fs;
+    use std::fs::File;
+    use serde_json::to_writer_pretty;
 
     #[test]
     fn test_convert_increment_to_precision() {
-        let value = rust_decimal::prelude::FromPrimitive::from_f64(0.1).unwrap();
+        let value = FromPrimitive::from_f64(0.1).unwrap();
         let precision = convert_increment_to_precision(value);
-        assert_eq!(precision, 1 as u32);
+        assert_eq!(precision, 1u32);
     }
 
     #[test]
     fn test_write_to_csv() {
-        // Create a test file
         let filename = "test_write_to_csv.csv";
+        
         write_to_csv(
             filename,
-            rust_decimal::Decimal::from(10 as i64),
-            rust_decimal::Decimal::from(10 as i64),
+            Decimal::from(10i64),
+            Decimal::from(10i64),
             &Side::Sell,
-            1 as usize,
-        ).unwrap();
+            1usize,
+        ).expect("Failed to write to CSV");
 
-        // Verify the file, and delete it
-        let mut rdr = csv::Reader::from_path(filename).unwrap();
+        let mut rdr = Reader::from_path(filename).expect("Failed to read CSV file");
         for result in rdr.records() {
-            let record = result.unwrap();
-            // Only compare two records
-            assert_eq!(record[1], "10".to_string());
-            assert_eq!(record[2], "10".to_string());
-        };
+            let record = result.expect("Failed to read record");
+            assert_eq!(record[1], "10");
+            assert_eq!(record[2], "10");
+        }
 
-        std::fs::remove_file(filename).unwrap();
+        fs::remove_file(filename).expect("Failed to remove test file");
     }
 
     #[test]
     fn test_read_settings() {
-        // Create a test file
         let filename = "test_read_settings.json";
         let data = SettingsFile {
             market_name: "BTC-USD".to_string(),
@@ -50,24 +54,22 @@ mod test_helpers {
             sl_percent: Default::default(),
             write_to_file: false,
         };
-        serde_json::to_writer_pretty(
-            &std::fs::File::create(filename).unwrap(), &data).unwrap();
 
-        // Verify the test file, and delete it
+        to_writer_pretty(&File::create(filename).expect("Failed to create file"), &data)
+            .expect("Failed to write JSON data");
+
         let settings = read_settings(filename);
-        assert_eq!(settings.time_delta, 1 as u64);
-        assert_eq!(settings.bb_period, 10 as usize);
-        assert_eq!(settings.bb_std_dev, 0 as f64);
-        assert_eq!(settings.orderbook_depth, 0 as u32);
-        std::fs::remove_file(filename).unwrap();
+        assert_eq!(settings.time_delta, 1u64);
+        assert_eq!(settings.bb_period, 10usize);
+        assert_eq!(settings.bb_std_dev, 0f64);
+        assert_eq!(settings.orderbook_depth, 0u32);
+
+        fs::remove_file(filename).expect("Failed to remove test file");
     }
 
     #[test]
     fn test_invert_side() {
-        let inverted_sell_side = invert_side(ftx::rest::Side::Sell);
-        let inverted_buy_side = invert_side(ftx::rest::Side::Buy);
-
-        assert_eq!(inverted_sell_side, ftx::rest::Side::Buy);
-        assert_eq!(inverted_buy_side, ftx::rest::Side::Sell);
+        assert_eq!(invert_side(Side::Sell), Side::Buy);
+        assert_eq!(invert_side(Side::Buy), Side::Sell);
     }
 }
