@@ -2,7 +2,7 @@
 
 A trading bot written in Rust 🦀.
 
-The strategy based on the concept of *mean reversion*. We look for large deviations in the volume delta of BTC-PERP on
+The strategy based on the concept of _mean reversion_. We look for large deviations in the volume delta of BTC-PERP on
 FTX until a defined depth.
 These deviations could be caused by over-enthusiastic and over-leveraged market participants (speculation).
 
@@ -16,13 +16,13 @@ the sampling period and market depth for generating triggers.
 We use the definitions:
 
 | Name            | Definition                                                             |
-|-----------------|------------------------------------------------------------------------|
+| --------------- | ---------------------------------------------------------------------- |
 | `bid_ask_delta` | Difference between the sum of bid and ask volumes till a defined depth |
 | `bb.upper`      | Upper bollinger band (L=20, SD=2) of `bid_ask_delta`                   |
 | `bb.lower`      | Lower bollinger band (L=20, SD=2) of `bid_ask_delta`                   |
 
 | Trigger                    | Position |
-|----------------------------|----------|
+| -------------------------- | -------- |
 | `bid_ask_delta > bb.upper` | short    |
 | `bid_ask_delta < bb.lower` | long     |
 
@@ -70,8 +70,8 @@ cargo run
 
 ## Orderbook Delta GUI (optional delta strategy tester)
 
-To test out new delta strategies and visualize them live, use the orderbook-delta-visualizer. 
-It's written in Python, with plotting handled by Dash and Plotly, and contains a set of configurable parameters 
+To test out new delta strategies and visualize them live, use the orderbook-delta-visualizer.
+It's written in Python, with plotting handled by Dash and Plotly, and contains a set of configurable parameters
 and strategies. See `orderbook-delta-visualizer/` for more details.
 
 [GUI](https://user-images.githubusercontent.com/15251343/176155957-e6096eb1-a1ef-4373-b66e-7ebaa83b5b84.mov)
@@ -81,7 +81,7 @@ and strategies. See `orderbook-delta-visualizer/` for more details.
 `settings.json` contains all the configurable options:
 
 | Name              | Explanation                                                            |
-|-------------------|------------------------------------------------------------------------|
+| ----------------- | ---------------------------------------------------------------------- |
 | `market_name`     | Name of futures market on FTX (default: BTC-PERP)                      |
 | `sampling_time`   | Time (in seconds) to sample orderbook, each sample is 1s (default: 60) |
 | `bb_period`       | Bollinger band period (default: 20)                                    |
@@ -97,16 +97,16 @@ and strategies. See `orderbook-delta-visualizer/` for more details.
 
 - [ ] Use Kelly criterion for order sizing (probabilities can be estimated from prior analysis)
 - [ ] Use dynamic take profit and stop loss based on market movement (this is simply used as protection from getting
-  rekt, not as actual exit points)
+      rekt, not as actual exit points)
 - [ ] Perform spectral analysis with wider timeframes to identify optimal
-  market conditions
+      market conditions
 - [ ] Switch to websockets API for reduced data query lag
 - [ ] For more high frequency applications, switching to a library
-  like [ccapi](https://github.com/crypto-chassis/ccapi/) is handy. Unfortunately this only exists for C++ right now.
+      like [ccapi](https://github.com/crypto-chassis/ccapi/) is handy. Unfortunately this only exists for C++ right now.
 
 ## Disclaimer
 
-This project is for educational purposes only. You should not construe any such information or other material as legal,
+You should not construe any such information or other material as legal,
 tax, investment, financial, or other advice. Nothing contained here constitutes a solicitation, recommendation,
 endorsement, or offer by me or any third party service provider to buy or sell any securities or other financial
 instruments in this or in any other jurisdiction in which such solicitation or offer would be unlawful under the
